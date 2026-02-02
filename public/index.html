@@ -154,11 +154,11 @@
       </div>
       <div class="card">
         <h3>Bloqueados</h3>
-        <span id="locked">0</span>
+        <span id="lock">0</span>
       </div>
       <div class="card">
         <h3>Liberados</h3>
-        <span id="unlocked">0</span>
+        <span id="unlock">0</span>
       </div>
     </div>
 
@@ -187,8 +187,8 @@
     const socket = io();
 
     const totalEl = document.getElementById('total');
-    const lockedEl = document.getElementById('locked');
-    const unlockedEl = document.getElementById('unlocked');
+    const lockedEl = document.getElementById('lock');
+    const unlockedEl = document.getElementById('unlock');
     const table = document.getElementById('logTable');
 
     const state = {};
@@ -212,18 +212,18 @@
       const values = Object.values(state);
 
       totalEl.textContent = values.length;
-      lockedEl.textContent = values.filter(v => v.locked).length;
-      unlockedEl.textContent = values.filter(v => !v.locked).length;
+      lockedEl.textContent = values.filter(v => v.lock).length;
+      unlockedEl.textContent = values.filter(v => !v.lock).length;
 
       values
         .sort((a, b) => b.timestamp - a.timestamp)
         .forEach(g => {
           const tr = document.createElement('tr');
-          tr.className = g.locked ? 'locked' : 'unlocked';
+          tr.className = g.lock ? 'lock' : 'unlock';
 
           tr.innerHTML = `
             <td>${g.name}</td>
-            <td><span class="badge ${g.locked ? 'locked' : 'unlocked'}">
+            <td><span class="badge ${g.lock ? 'lock' : 'unlock'}">
               ${g.locked ? 'BLOQUEADO' : 'LIBERADO'}
             </span></td>
             <td>${g.action}</td>
