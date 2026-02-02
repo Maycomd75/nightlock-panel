@@ -27,11 +27,11 @@ io.on("connection", socket => {
   socket.on("log:event", data => {
     logs.push(data);
 
-    if (data.type === "LOCKED" || data.type === "UNLOCKED") {
+    if (data.type === "LOCK" || data.type === "UNLOCK") {
       groups[data.group] = {
         id: data.group,
         name: data.group,
-        locked: data.type === "LOCKED",
+        locked: data.type === "LOCK",
         action: data.type,
         timestamp: data.timestamp
       };
