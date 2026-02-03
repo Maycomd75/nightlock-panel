@@ -20,17 +20,12 @@ const logs = [];
 
 io.on("connection", socket => {
   console.log("🟢 Conectado:", socket.id);
-  
-socket.on("state:request", () => {
-  socket.emit("group:bulk", Object.values(groups));
-});
 
-  // Envia estado atual
-  socket.emit("group:bulk", Object.values(groups));
+  socket.on("state:request", () => {
+    socket.emit("group:bulk", Object.values(groups));
+  });
 
   socket.on("log:event", data => {
-    logs.push(data);
-
     if (data.type === "LOCK" || data.type === "UNLOCK") {
       groups[data.group] = {
         id: data.group,
@@ -42,8 +37,6 @@ socket.on("state:request", () => {
 
       io.emit("group:update", groups[data.group]);
     }
-
-    io.emit("log:event", data);
   });
 
   socket.on("pm2:restart", () => io.emit("pm2:restart"));
@@ -51,6 +44,7 @@ socket.on("state:request", () => {
   socket.on("pm2:start", () => io.emit("pm2:start"));
   socket.on("pm2:flush", () => io.emit("pm2:flush"));
 });
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
