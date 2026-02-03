@@ -22,8 +22,9 @@ io.on("connection", socket => {
   console.log("🟢 Conectado:", socket.id);
   
 socket.on("state:request", () => {
-  io.emit("state:request");
+  socket.emit("group:bulk", Object.values(groups));
 });
+
   // Envia estado atual
   socket.emit("group:bulk", Object.values(groups));
 
