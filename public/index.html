@@ -183,57 +183,60 @@
   </main>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
+<script>
+  const socket = io();
 
-    const totalEl = document.getElementById('total');
-    const lockedEl = document.getElementById('lock');
-    const unlockedEl = document.getElementById('unlock');
-    const table = document.getElementById('logTable');
+  const totalEl = document.getElementById('total');
+  const lockedEl = document.getElementById('lock');
+  const unlockedEl = document.getElementById('unlock');
+  const table = document.getElementById('logTable');
 
-    const state = {};
+  const state = {};
 
-    socket.on('group:update', data => {
-      state[data.id] = data;
-      render();
-    });
+  socket.on('group:update', data => {
+    state[data.id] = data;
+    render();
+  });
 
-    socket.on('group:bulk', groups => {
-      groups.forEach(g => state[g.id] = g);
-      render();
-    });
+  socket.on('group:bulk', groups => {
+    groups.forEach(g => state[g.id] = g);
+    render();
+  });
 
-    function pm2(action) {
-      socket.emit(`pm2:${action}`);
-    }
+  function pm2(action) {
+    socket.emit(`pm2:${action}`);
+  }
 
-    function render() {
-      table.innerHTML = '';
-      const values = Object.values(state);
+  function render() {
+    table.innerHTML = '';
+    const values = Object.values(state);
 
-      totalEl.textContent = values.length;
-      lockedEl.textContent = values.filter(v => v.lock).length;
-      unlockedEl.textContent = values.filter(v => !v.lock).length;
+    totalEl.textContent = values.length;
+    lockedEl.textContent = values.filter(v => v.locked).length;
+    unlockedEl.textContent = values.filter(v => !v.locked).length;
 
-      values
-        .sort((a, b) => b.timestamp - a.timestamp)
-        .forEach(g => {
-          const tr = document.createElement('tr');
-          tr.className = g.lock ? 'lock' : 'unlock';
+    values
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .forEach(g => {
+        const tr = document.createElement('tr');
+        tr.className = g.locked ? 'locked' : 'unlocked';
 
-          tr.innerHTML = `
-            <td>${g.name}</td>
-            <td><span class="badge ${g.lock ? 'lock' : 'unlock'}">
+        tr.innerHTML = `
+          <td>${g.name}</td>
+          <td>
+            <span class="badge ${g.locked ? 'locked' : 'unlocked'}">
               ${g.locked ? 'BLOQUEADO' : 'LIBERADO'}
-            </span></td>
-            <td>${g.action}</td>
-            <td>${new Date(g.timestamp).toLocaleTimeString('pt-BR')}</td>
-          `;
+            </span>
+          </td>
+          <td>${g.action}</td>
+          <td>${new Date(g.timestamp).toLocaleTimeString('pt-BR')}</td>
+        `;
 
-          table.appendChild(tr);
-        });
-    }
-  </script>
+        table.appendChild(tr);
+      });
+  }
+</script>
+
 
 </body>
 </html>
