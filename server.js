@@ -20,7 +20,10 @@ const logs = [];
 
 io.on("connection", socket => {
   console.log("🟢 Conectado:", socket.id);
-
+  
+socket.on("state:request", () => {
+  io.emit("state:request");
+});
   // Envia estado atual
   socket.emit("group:bulk", Object.values(groups));
 
