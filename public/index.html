@@ -185,7 +185,9 @@
   <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
-
+   socket.on("connect", () => {
+  socket.emit("state:request");
+});
   const totalEl = document.getElementById('total');
   const lockedEl = document.getElementById('lock');
   const unlockedEl = document.getElementById('unlock');
