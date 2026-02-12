@@ -33,37 +33,53 @@ function saveDB() {
   fs.writeFileSync(DB_FILE, JSON.stringify(groups, null, 2));
 }
 
+// 🔥 função que cria ID FIXO do grupo
+function normalizeGroupId(jid){
+  // remove tudo depois do @
+  // 1203632040-162345@g.us -> 1203632040-162345
+  return String(jid).split('@')[0];
+}
+
 // ================================
 // 🔌 SOCKET.IO
 // ================================
 io.on("connection", socket => {
   console.log("🟢 Conectado:", socket.id);
 
-  // 🔁 Envia estado atual ao conectar
+  // envia estado completo ao conectar
   socket.emit("group:bulk", Object.values(groups));
 
   // 📡 Recebe eventos do agente
   socket.on("log:event", data => {
+
+    if (!data || !data.group) return;
     if (data.type !== "LOCK" && data.type !== "UNLOCK") return;
 
-    const current = groups[data.group];
+    // 🔥 usa ID normalizado (NÃO MAIS o JID bruto)
+    const groupId = normalizeGroupId(data.group);
 
-    // 🛑 Evita duplicação (mesmo estado)
+    const current = groups[groupId];
+
+    // evita duplicação do mesmo estado
     if (current && current.locked === (data.type === "LOCK")) {
       return;
     }
 
-    groups[data.group] = {
-      id: data.group,
-      name: data.group,
+    groups[groupId] = {
+      id: groupId,
+      name: data.group, // ainda mostramos o nome original
       locked: data.type === "LOCK",
       action: data.type,
-      timestamp: data.timestamp
+      timestamp: data.timestamp || Date.now()
     };
 
     saveDB();
 
-    io.emit("group:update", groups[data.group]);
+    // envia atualização individual
+    io.emit("group:update", groups[groupId]);
+
+    // 🔥 força sincronização total (corrige painel)
+    io.emit("group:bulk", Object.values(groups));
   });
 
   // 🎛️ CONTROLE PM2
